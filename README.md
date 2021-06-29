@@ -4,13 +4,13 @@
 [![license](https://img.shields.io/badge/license-Apache%202.0-blue)](https://github.com/awslabs/amazon-qldb-driver-js/blob/master/LICENSE)
 [![AWS Provider](https://img.shields.io/badge/provider-AWS-orange?logo=amazon-aws&color=ff9900)](https://aws.amazon.com/qldb/)
 
-This is the Node.js driver for Amazon Quantum Ledger Database (QLDB), which allows Node.js developers to write software that makes use of AmazonQLDB.
+This is the JavaScript driver for Amazon Quantum Ledger Database (QLDB), which allows Web apps developers to access AmazonQLDB directly from JavaScript code running in the browser.
 
 ## Requirements
 
 ### Basic Configuration
 
-See [Getting started in a browser script](https://docs.aws.amazon.com/sdk-for-javascript/v3/developer-guide/getting-started-browser.html) for more information connecting to AWS.
+See [Getting started in a browser script](https://docs.aws.amazon.com/sdk-for-javascript/v2/developer-guide/getting-started-browser.html) for more information connecting to AWS.
 
 You need to create and use an [Amazon Cognito Identity pool](https://docs.aws.amazon.com/cognito/latest/developerguide/cognito-identity.html) to provide unauthenticated access to your browser script for the Amazon QLDB service. Creating an identity pool also creates two AWS Identity and Access Management (IAM) roles, one to support users authenticated by an identity provider and the other to support unauthenticated guest users.
                                                                                                                                               

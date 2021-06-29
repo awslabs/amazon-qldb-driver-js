@@ -69,19 +69,19 @@ export class QldbDriver {
      *                          See {@link https://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/QLDBSession.html#constructor-details|Low Level Client Constructor}.
      * @param maxConcurrentTransactions The driver internally uses a pool of sessions to execute the transactions.
      *                                  The maxConcurrentTransactions parameter specifies the number of sessions that the driver can hold in the pool.
-     *                                  The default is set to maximum number of sockets specified in the globalAgent or {@link DEFAULT_MAX_SOCKETS}.
+     *                                  The default is set to maximum number of sockets which is {@link DEFAULT_MAX_SOCKETS}.
      *                                  See {@link https://docs.aws.amazon.com/qldb/latest/developerguide/driver.best-practices.html#driver.best-practices.configuring} for more details.
      * @param retryConfig Config to specify max number of retries, base and custom backoff strategy for retries. Will be overridden if a different retryConfig
-     *                    is passed to {@linkcode executeLambda}.
+     *                    is passed to {@link executeLambda}.
      *
-     * @param qldbSessionFactory the means of creating a QLDBSession. For most use cases it it not required to pass this in.
+     * @param qldbSessionFactory the means of creating a QLDBSession. For most use cases it is not required to pass this in.
      *
-     * @throws RangeError if `maxConcurrentTransactions` is less than 0.
+     * @throws RangeError if `maxConcurrentTransactions` is not in the range of between 0 and {@link DEFAULT_MAX_SOCKETS}.
      */
     constructor(
         ledgerName: string,
         qldbClientOptions: ClientConfiguration = {},
-        maxConcurrentTransactions: number = 0,
+        maxConcurrentTransactions: number = DEFAULT_MAX_SOCKETS,
         retryConfig: RetryConfig = defaultRetryConfig,
         qldbSessionFactory: (options: ClientConfiguration ) => QLDBSession = () => new QLDBSession(qldbClientOptions)
     ) {
@@ -93,23 +93,14 @@ export class QldbDriver {
         this._isClosed = false;
         this._retryConfig = retryConfig;
 
-        if (maxConcurrentTransactions < 0) {
-            throw new RangeError("Value for maxConcurrentTransactions cannot be negative.");
+        if (maxConcurrentTransactions <= 0) {
+            throw new RangeError("Value for maxConcurrentTransactions cannot be zero or negative.");
         }
 
-        const maxSockets = qldbClientOptions.httpOptions && qldbClientOptions.httpOptions.agent
-            ? qldbClientOptions.httpOptions.agent.maxSockets
-            : DEFAULT_MAX_SOCKETS;
-
-        if (0 === maxConcurrentTransactions) {
-            this._maxConcurrentTransactions = maxSockets;
-        } else {
-            this._maxConcurrentTransactions = maxConcurrentTransactions;
-        }
-        if (this._maxConcurrentTransactions > maxSockets) {
+        if (this._maxConcurrentTransactions > DEFAULT_MAX_SOCKETS) {
             throw new RangeError(
                 `The session pool limit given, ${this._maxConcurrentTransactions}, exceeds the limit set by the client,
-                 ${maxSockets}. Please lower the limit and retry.`
+                 ${DEFAULT_MAX_SOCKETS}. Please lower the limit and retry.`
             );
         }
 
