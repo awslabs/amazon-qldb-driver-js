@@ -1,8 +1,7 @@
-# Amazon QLDB Node.js Driver
+## Amazon QLDB JavaScript Driver
 
-[![NPM Version](https://img.shields.io/badge/npm-v2.2.0-green)](https://www.npmjs.com/package/amazon-qldb-driver-nodejs)
-[![Documentation](https://img.shields.io/badge/docs-api-green.svg)](https://docs.aws.amazon.com/qldb/latest/developerguide/getting-started.nodejs.html)
-[![license](https://img.shields.io/badge/license-Apache%202.0-blue)](https://github.com/awslabs/amazon-qldb-driver-nodejs/blob/master/LICENSE)
+[![NPM Version](https://img.shields.io/badge/npm-v0.0.1-green)](https://www.npmjs.com/package/amazon-qldb-driver-js)
+[![license](https://img.shields.io/badge/license-Apache%202.0-blue)](https://github.com/awslabs/amazon-qldb-driver-js/blob/master/LICENSE)
 [![AWS Provider](https://img.shields.io/badge/provider-AWS-orange?logo=amazon-aws&color=ff9900)](https://aws.amazon.com/qldb/)
 
 This is the Node.js driver for Amazon Quantum Ledger Database (QLDB), which allows Node.js developers to write software that makes use of AmazonQLDB.
@@ -11,12 +10,10 @@ This is the Node.js driver for Amazon Quantum Ledger Database (QLDB), which allo
 
 ### Basic Configuration
 
-See [Accessing Amazon QLDB](https://docs.aws.amazon.com/qldb/latest/developerguide/accessing.html) for information on connecting to AWS.
+See [Getting started in a browser script](https://docs.aws.amazon.com/sdk-for-javascript/v3/developer-guide/getting-started-browser.html) for more information connecting to AWS.
 
-The JavaScript AWS SDK needs to have AWS_SDK_LOAD_CONFIG environment variable set to a truthy value in order to read
-from the ~/.aws/config file.
-
-See [Setting Region](https://docs.aws.amazon.com/sdk-for-javascript/v2/developer-guide/setting-region.html) page for more information.
+You need to create and use an [Amazon Cognito Identity pool](https://docs.aws.amazon.com/cognito/latest/developerguide/cognito-identity.html) to provide unauthenticated access to your browser script for the Amazon QLDB service. Creating an identity pool also creates two AWS Identity and Access Management (IAM) roles, one to support users authenticated by an identity provider and the other to support unauthenticated guest users.
+                                                                                                                                              
 
 ### TypeScript 3.8.x
 
@@ -31,7 +28,7 @@ Please see the link below for more detail on TypeScript 3.8.x:
 
 To use the driver, in your package that wishes to use the driver, run the following:
 
-```npm install amazon-qldb-driver-nodejs```
+```npm install amazon-qldb-driver-js```
 
 The driver also has aws-sdk, ion-js and jsbi as peer dependencies. Thus, they must also be dependencies of the package that will be using the driver as a dependency.
 
@@ -41,15 +38,18 @@ The driver also has aws-sdk, ion-js and jsbi as peer dependencies. Thus, they mu
 
 ```npm install jsbi```
 
-#### Note: For using version 2.1.0 and above of the driver, the version of the aws-sdk should be >= 2.815
-
 Then from within your package, you can now use the driver by importing it. This example shows usage in TypeScript specifying the QLDB ledger name and a specific region:
 
 ```javascript
-import { QldbDriver } from "amazon-qldb-driver-nodejs";
+const { CognitoIdentityClient } = require("@aws-sdk/client-cognito-identity");
+import { QldbDriver } from "amazon-qldb-driver-js";
 
 const testServiceConfigOptions = {
-    region: "us-east-1"
+    region: "us-east-1",
+    credentials: fromCognitoIdentityPool({
+        client: new CognitoIdentityClient({ region: "us-east-1" }),
+        identityPoolId: "IDENTITY_POOL_ID" // IDENTITY_POOL_ID
+  }),
 };
 
 const qldbDriver: QldbDriver = new QldbDriver("testLedger", testServiceConfigOptions);
@@ -60,13 +60,10 @@ qldbDriver.getTableNames().then(function(tableNames: string[]) {
 
 ### See Also
 
-1. [Amazon QLDB Nodejs Driver Tutorial](https://docs.aws.amazon.com/qldb/latest/developerguide/getting-started.nodejs.html): In this tutorial, you use the QLDB Driver for Node.js to create an Amazon QLDB ledger and populate it with tables and sample data.
-2. [Amazon QLDB Nodejs Driver Samples](https://github.com/aws-samples/amazon-qldb-dmv-sample-nodejs): A DMV based example application which demonstrates how to use QLDB with the QLDB Driver for Node.js.
-3. QLDB Nodejs driver accepts and returns [Amazon ION](http://amzn.github.io/ion-docs/) Documents. Amazon Ion is a richly-typed, self-describing, hierarchical data serialization format offering interchangeable binary and text representations. For more information read the [ION docs](http://amzn.github.io/ion-docs/docs.html).
-4. [Amazon ION Cookbook](http://amzn.github.io/ion-docs/guides/cookbook.html): This cookbook provides code samples for some simple Amazon Ion use cases.
-5. Amazon QLDB supports the [PartiQL](https://partiql.org/) query language. PartiQL provides SQL-compatible query access across multiple data stores containing structured data, semistructured data, and nested data. For more information read the [PartiQL docs](https://partiql.org/docs.html).
-6. Refer the section [Common Errors while using the Amazon QLDB Drivers](https://docs.aws.amazon.com/qldb/latest/developerguide/driver-errors.html) which describes runtime errors that can be thrown by the Amazon QLDB Driver when calling the qldb-session APIs.
-
+1. QLDB JavaScript driver accepts and returns [Amazon ION](http://amzn.github.io/ion-docs/) Documents. Amazon Ion is a richly-typed, self-describing, hierarchical data serialization format offering interchangeable binary and text representations. For more information read the [ION docs](http://amzn.github.io/ion-docs/docs.html).
+1. [Amazon ION Cookbook](http://amzn.github.io/ion-docs/guides/cookbook.html): This cookbook provides code samples for some simple Amazon Ion use cases.
+1. Amazon QLDB supports the [PartiQL](https://partiql.org/) query language. PartiQL provides SQL-compatible query access across multiple data stores containing structured data, semistructured data, and nested data. For more information read the [PartiQL docs](https://partiql.org/docs.html).
+1. Refer the section [Common Errors while using the Amazon QLDB Drivers](https://docs.aws.amazon.com/qldb/latest/developerguide/driver-errors.html) which describes runtime errors that can be thrown by the Amazon QLDB Driver when calling the qldb-session APIs.
 
 ## Development
 
