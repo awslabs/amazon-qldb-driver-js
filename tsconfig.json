@@ -1,0 +1,21 @@
+{
+    "compilerOptions": {
+        "target": "ES2015",
+        "module": "commonjs",
+        "lib": [ "ES2015" ],
+        "strict": true,
+        "strictNullChecks": false,
+        "resolveJsonModule": true,
+        "declaration": true,
+        "outDir": "dist",
+        "stripInternal": true
+    },
+    "include": [
+        "src/**/*.ts",
+        "index.ts"
+    ],
+    "exclude": [
+        "src/integrationtest/*",
+        "src/test/*"
+    ]
+}
