@@ -69,7 +69,7 @@ export class QldbDriver {
      *                          See {@link https://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/QLDBSession.html#constructor-details|Low Level Client Constructor}.
      * @param maxConcurrentTransactions The driver internally uses a pool of sessions to execute the transactions.
      *                                  The maxConcurrentTransactions parameter specifies the number of sessions that the driver can hold in the pool.
-     *                                  The default is set to maximum number of sockets specified in the globalAgent.
+     *                                  The default is set to maximum number of sockets specified in the globalAgent or {@link DEFAULT_MAX_SOCKETS}.
      *                                  See {@link https://docs.aws.amazon.com/qldb/latest/developerguide/driver.best-practices.html#driver.best-practices.configuring} for more details.
      * @param retryConfig Config to specify max number of retries, base and custom backoff strategy for retries. Will be overridden if a different retryConfig
      *                    is passed to {@linkcode executeLambda}.
@@ -85,7 +85,7 @@ export class QldbDriver {
         retryConfig: RetryConfig = defaultRetryConfig,
         qldbSessionFactory: (options: ClientConfiguration ) => QLDBSession = () => new QLDBSession(qldbClientOptions)
     ) {
-        qldbClientOptions.customUserAgent = `QLDB Driver for Node.js v${version}`;
+        qldbClientOptions.customUserAgent = `QLDB Driver for JavaScript v${version}`;
         qldbClientOptions.maxRetries = 0;
 
         this._qldbClient = qldbSessionFactory(qldbClientOptions);
