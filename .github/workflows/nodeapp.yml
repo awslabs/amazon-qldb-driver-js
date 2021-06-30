@@ -2,9 +2,9 @@ name: Node.js Application
 
 on:
   push:
-    branches: [ master ]
+    branches: [ main ]
   pull_request:
-    branches: [ master, driver-v1.0.0, driver-v2.0.0 ]
+    branches: [ main ]
 
 jobs:
   build:

@@ -10,9 +10,7 @@ This is the JavaScript driver for Amazon Quantum Ledger Database (QLDB), which a
 
 ### Basic Configuration
 
-See [Getting started in a browser script](https://docs.aws.amazon.com/sdk-for-javascript/v2/developer-guide/getting-started-browser.html) for more information connecting to AWS.
-
-You need to create and use an [Amazon Cognito Identity pool](https://docs.aws.amazon.com/cognito/latest/developerguide/cognito-identity.html) to provide unauthenticated access to your browser script for the Amazon QLDB service. Creating an identity pool also creates two AWS Identity and Access Management (IAM) roles, one to support users authenticated by an identity provider and the other to support unauthenticated guest users.
+See [Getting started in a browser script](https://docs.aws.amazon.com/sdk-for-javascript/v2/developer-guide/getting-started-browser.html) and [Getting started in Node.js](https://docs.aws.amazon.com/sdk-for-javascript/v2/developer-guide/getting-started-nodejs.html) for more information connecting to AWS.
                                                                                                                                               
 
 ### Usage with TypeScript 3.8.x
