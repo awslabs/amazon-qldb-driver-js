@@ -4,7 +4,7 @@
 [![license](https://img.shields.io/badge/license-Apache%202.0-blue)](https://github.com/awslabs/amazon-qldb-driver-js/blob/master/LICENSE)
 [![AWS Provider](https://img.shields.io/badge/provider-AWS-orange?logo=amazon-aws&color=ff9900)](https://aws.amazon.com/qldb/)
 
-This is the JavaScript driver for Amazon Quantum Ledger Database (QLDB), which allows Web apps developers to access AmazonQLDB directly from JavaScript code running in the browser.
+This is the JavaScript driver for Amazon Quantum Ledger Database (QLDB), which allows JavaScript and TypeScript developers to access AmazonQLDB in their Node.js, web, and mobile web applications.
 
 ## Requirements
 
@@ -15,7 +15,7 @@ See [Getting started in a browser script](https://docs.aws.amazon.com/sdk-for-ja
 You need to create and use an [Amazon Cognito Identity pool](https://docs.aws.amazon.com/cognito/latest/developerguide/cognito-identity.html) to provide unauthenticated access to your browser script for the Amazon QLDB service. Creating an identity pool also creates two AWS Identity and Access Management (IAM) roles, one to support users authenticated by an identity provider and the other to support unauthenticated guest users.
                                                                                                                                               
 
-### TypeScript 3.8.x
+### Usage with TypeScript 3.8.x
 
 Development of the driver requires TypeScript 3.8.x. It will be automatically installed as a dependency. It is also recommended to use TypeScript when using the driver.
 Please see the link below for more detail on TypeScript 3.8.x:

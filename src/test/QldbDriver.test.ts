@@ -18,12 +18,11 @@ import { AWSError, QLDBSession } from "aws-sdk";
 import { ClientConfiguration, SendCommandResult } from "aws-sdk/clients/qldbsession";
 import * as chai from "chai";
 import * as chaiAsPromised from "chai-as-promised";
-import { Agent } from "https";
 import Semaphore from "semaphore-async-await";
 import * as sinon from "sinon";
 
 import { DriverClosedError, ExecuteError, SessionPoolEmptyError } from "../errors/Errors";
-import { QldbDriver } from "../QldbDriver";
+import {DEFAULT_MAX_SOCKETS, QldbDriver} from "../QldbDriver";
 import { QldbSession } from "../QldbSession";
 import { defaultRetryConfig } from "../retry/DefaultRetryConfig";
 import { Result } from "../Result";
@@ -36,7 +35,6 @@ const sandbox = sinon.createSandbox();
 const testDefaultRetryLimit: number = 4;
 const testLedgerName: string = "LedgerName";
 const testMaxRetries: number = 0;
-const testMaxSockets: number = 10;
 const testTableNames: string[] = ["Vehicle", "Person"];
 const testSendCommandResult: SendCommandResult = {
     StartSession: {
@@ -45,16 +43,10 @@ const testSendCommandResult: SendCommandResult = {
 };
 
 let qldbDriver: QldbDriver;
-let sendCommandStub;
 let testQldbLowLevelClient: QLDBSession;
 
-const mockAgent: Agent = <Agent><any> sandbox.mock(Agent);
-mockAgent.maxSockets = testMaxSockets;
 const testLowLevelClientOptions: ClientConfiguration = {
-    region: "fakeRegion",
-    httpOptions: {
-        agent: mockAgent
-    }
+    region: "fakeRegion"
 };
 
 const mockResult: Result = <Result><any> sandbox.mock(Result);
@@ -70,18 +62,10 @@ mockQldbSession.isAlive = () => true;
 describe("QldbDriver", () => {
     beforeEach(() => {
         testQldbLowLevelClient = new QLDBSession(testLowLevelClientOptions);
-        sendCommandStub = sandbox.stub(testQldbLowLevelClient, "sendCommand");
-        sendCommandStub.returns({
-            promise: () => {
-                return testSendCommandResult;
-            }
-        });
-
         qldbDriver = new QldbDriver(testLedgerName, testLowLevelClientOptions);
     });
 
     afterEach(() => {
-        mockAgent.maxSockets = testMaxSockets;
         sandbox.restore();
     });
 
@@ -91,11 +75,11 @@ describe("QldbDriver", () => {
             chai.assert.equal(qldbDriver["_isClosed"], false);
             chai.assert.instanceOf(qldbDriver["_qldbClient"], QLDBSession);
             chai.assert.equal(qldbDriver["_qldbClient"].config.maxRetries, testMaxRetries);
-            chai.assert.equal(qldbDriver["_maxConcurrentTransactions"], mockAgent.maxSockets);
-            chai.assert.equal(qldbDriver["_availablePermits"], mockAgent.maxSockets);
+            chai.assert.equal(qldbDriver["_maxConcurrentTransactions"], DEFAULT_MAX_SOCKETS);
+            chai.assert.equal(qldbDriver["_availablePermits"], DEFAULT_MAX_SOCKETS);
             chai.assert.deepEqual(qldbDriver["_sessionPool"], []);
             chai.assert.instanceOf(qldbDriver["_semaphore"], Semaphore);
-            chai.assert.equal(qldbDriver["_semaphore"]["permits"], mockAgent.maxSockets);
+            chai.assert.equal(qldbDriver["_semaphore"]["permits"], DEFAULT_MAX_SOCKETS);
             chai.assert.equal(qldbDriver["_retryConfig"], defaultRetryConfig);
             chai.assert.equal(qldbDriver["_retryConfig"]["_retryLimit"], testDefaultRetryLimit);
         });
@@ -103,13 +87,6 @@ describe("QldbDriver", () => {
         it("should throw a RangeError when retryLimit less than zero passed in", () => {
             const constructorFunction: () => void = () => {
                 new QldbDriver(testLedgerName, testLowLevelClientOptions, -1);
-            };
-            chai.assert.throws(constructorFunction, RangeError);
-        });
-
-        it("should throw a RangeError when maxConcurrentTransactions greater than maxSockets", () => {
-            const constructorFunction: () => void  = () => {
-                new QldbDriver(testLedgerName, testLowLevelClientOptions, testMaxSockets + 1);
             };
             chai.assert.throws(constructorFunction, RangeError);
         });

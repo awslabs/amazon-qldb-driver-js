@@ -31,7 +31,7 @@ import { defaultRetryConfig } from "./retry/DefaultRetryConfig";
 import { RetryConfig } from "./retry/RetryConfig";
 import { TransactionExecutor } from "./TransactionExecutor";
 
-const DEFAULT_MAX_SOCKETS = 32;
+export const DEFAULT_MAX_SOCKETS = 6;
 
 /**
   * This is the entry point for all interactions with Amazon QLDB.
@@ -76,7 +76,7 @@ export class QldbDriver {
      *
      * @param qldbSessionFactory the means of creating a QLDBSession. For most use cases it is not required to pass this in.
      *
-     * @throws RangeError if `maxConcurrentTransactions` is not in the range of between 0 and {@link DEFAULT_MAX_SOCKETS}.
+     * @throws RangeError if `maxConcurrentTransactions` is equal or less than 0.
      */
     constructor(
         ledgerName: string,
@@ -85,24 +85,18 @@ export class QldbDriver {
         retryConfig: RetryConfig = defaultRetryConfig,
         qldbSessionFactory: (options: ClientConfiguration ) => QLDBSession = () => new QLDBSession(qldbClientOptions)
     ) {
+        if (maxConcurrentTransactions <= 0) {
+            throw new RangeError("Value for maxConcurrentTransactions cannot be zero or negative.");
+        }
+
         qldbClientOptions.customUserAgent = `QLDB Driver for JavaScript v${version}`;
         qldbClientOptions.maxRetries = 0;
 
         this._qldbClient = qldbSessionFactory(qldbClientOptions);
         this._ledgerName = ledgerName;
+        this._maxConcurrentTransactions = maxConcurrentTransactions;
         this._isClosed = false;
         this._retryConfig = retryConfig;
-
-        if (maxConcurrentTransactions <= 0) {
-            throw new RangeError("Value for maxConcurrentTransactions cannot be zero or negative.");
-        }
-
-        if (this._maxConcurrentTransactions > DEFAULT_MAX_SOCKETS) {
-            throw new RangeError(
-                `The session pool limit given, ${this._maxConcurrentTransactions}, exceeds the limit set by the client,
-                 ${DEFAULT_MAX_SOCKETS}. Please lower the limit and retry.`
-            );
-        }
 
         this._availablePermits = this._maxConcurrentTransactions;
         this._sessionPool = [];
