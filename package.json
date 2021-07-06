@@ -1,7 +1,8 @@
 {
   "dependencies": {
     "ion-hash-js": "^2.0.0",
-    "semaphore-async-await": "^1.5.1"
+    "semaphore-async-await": "^1.5.1",
+    "@types/node": "^12.0.2"
   },
   "name": "amazon-qldb-driver-js",
   "description": "The JavaScript driver for working with Amazon Quantum Ledger Database",
@@ -15,7 +16,6 @@
     "@types/chai": "^4.2.10",
     "@types/chai-as-promised": "^7.1.2",
     "@types/mocha": "^5.2.7",
-    "@types/node": "^12.0.2",
     "@types/sinon": "^7.0.13",
     "@typescript-eslint/eslint-plugin": "^2.5.0",
     "@typescript-eslint/parser": "^2.5.0",
@@ -65,7 +65,7 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/awslabs/amazon-qldb-driver-nodejs"
+    "url": "https://github.com/awslabs/amazon-qldb-driver-js"
   },
   "nyc": {
     "include": [
