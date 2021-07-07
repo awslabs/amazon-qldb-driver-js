@@ -25,14 +25,11 @@ import * as chaiAsPromised from "chai-as-promised";
 import * as ionJs from "ion-js";
 import { Lock } from "semaphore-async-await";
 import * as sinon from "sinon";
-import { Readable } from "stream";
 
 import { Communicator } from "../Communicator";
 import * as Errors from "../errors/Errors";
-import * as LogUtil from "../LogUtil";
 import { QldbHash } from "../QldbHash";
 import { Result } from "../Result";
-import { ResultReadable } from "../ResultReadable";
 import { Transaction } from "../Transaction";
 import { expect } from "chai";
 
@@ -177,55 +174,6 @@ describe("Transaction", () => {
             const executeSpy = sandbox.spy(mockCommunicator, "executeStatement");
             await transaction.execute(testStatement);
             await transaction.execute(testStatement);
-            sinon.assert.calledTwice(executeSpy);
-        });
-    });
-
-    describe("#executeAndStreamResults()", () => {
-        it("should return a Stream object when provided with a statement", async () => {
-            const sampleResultReadableObject: ResultReadable = new ResultReadable(
-                testTransactionId,
-                testExecuteStatementResult,
-                mockCommunicator
-            );
-            const executeSpy = sandbox.spy(mockCommunicator, "executeStatement");
-            const result: Readable = await transaction.executeAndStreamResults(testStatement);
-            sinon.assert.calledOnce(executeSpy);
-            sinon.assert.calledWith(executeSpy, testTransactionId, testStatement, []);
-            chai.assert.equal(JSON.stringify(result), JSON.stringify(sampleResultReadableObject));
-        });
-
-        it("should return a Stream object when provided with a statement and parameters", async () => {
-            const sampleResultReadableObject: ResultReadable = new ResultReadable(
-                testTransactionId,
-                testExecuteStatementResult,
-                mockCommunicator
-            );
-            const sendExecuteSpy = sandbox.spy(transaction as any, "_sendExecute");
-            const param1: number = 5;
-            const param2: string = "a";
-            const result: Readable = await transaction.executeAndStreamResults(testStatement, param1, param2);
-            sinon.assert.calledOnce(sendExecuteSpy);
-            sinon.assert.calledWith(sendExecuteSpy, testStatement, [param1, param2]);
-            chai.assert.equal(JSON.stringify(result), JSON.stringify(sampleResultReadableObject));
-        });
-
-        it("should return a rejected promise when error is thrown", async () => {
-            mockCommunicator.executeStatement = async () => {
-                throw new Error(testMessage);
-            };
-            const isOccStub = sandbox.stub(Errors, "isOccConflictException");
-            isOccStub.returns(false);
-            const executeSpy = sandbox.spy(mockCommunicator, "executeStatement");
-            await chai.expect(transaction.executeAndStreamResults(testStatement)).to.be.rejected;
-            sinon.assert.calledOnce(executeSpy);
-            sinon.assert.calledWith(executeSpy, testTransactionId, testStatement, []);
-        });
-
-        it("should call Communicator's executeStatement() twice when called twice", async () => {
-            const executeSpy = sandbox.spy(mockCommunicator, "executeStatement");
-            await transaction.executeAndStreamResults(testStatement);
-            await transaction.executeAndStreamResults(testStatement);
             sinon.assert.calledTwice(executeSpy);
         });
     });

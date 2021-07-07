@@ -30,7 +30,6 @@ import * as sinon from "sinon";
 import { Communicator } from "../Communicator";
 import { ClientError } from "../errors/Errors";
 import { Result } from "../Result";
-import { ResultReadable } from "../ResultReadable";
 import { IOUsage } from "../stats/IOUsage";
 import { TimingInformation } from "../stats/TimingInformation";
 
@@ -83,18 +82,6 @@ describe("Result", () => {
                 throw new Error(testMessage);
             };
             await chai.expect(Result.create(testTransactionId, testExecuteResultWithNextPage, mockCommunicator)).to.be.rejected;
-        });
-    });
-
-    describe("#bufferResultReadable()", () => {
-        it("should return a Result object when called", async () => {
-            const sampleResultReadableObject: ResultReadable = new ResultReadable(
-                testTransactionId,
-                testExecuteResult,
-                mockCommunicator
-            );
-            const result = await Result.bufferResultReadable(sampleResultReadableObject);
-            chai.expect(result).to.be.an.instanceOf(Result);
         });
     });
 
@@ -251,41 +238,6 @@ describe("Result", () => {
             }
         });
 
-        it("should return a list of Ion values when Result object created with bufferResultReadable()", async () => {
-            const value1: ValueHolder = {IonBinary: "a"};
-            const value2: ValueHolder = {IonBinary: "b"};
-            const value3: ValueHolder = {IonBinary: "c"};
-            const value4: ValueHolder = {IonBinary: "d"};
-            const values: dom.Value[] = [
-                dom.load(Result._handleBlob(value1.IonBinary)),
-                dom.load(Result._handleBlob(value2.IonBinary)),
-                dom.load(Result._handleBlob(value3.IonBinary)),
-                dom.load(Result._handleBlob(value4.IonBinary))
-            ];
-            const allValues: ValueHolder[] = [value1, value2, value3, value4];
-            const testPage: Page = {Values: allValues};
-
-            mockCommunicator.fetchPage = async () => {
-                return {
-                    Page: testPage
-                };
-            };
-            const testExecuteResult: ExecuteStatementResult = {
-                FirstPage: testPage,
-            };
-            const mockResultReadable: ResultReadable = new ResultReadable(testTransactionId, testExecuteResult, mockCommunicator);
-
-            const result: Result = await Result.bufferResultReadable(<ResultReadable> mockResultReadable);
-            const resultList: dom.Value[] = result.getResultList();
-
-            chai.assert.equal(values.length, resultList.length);
-            resultList.forEach((result, i) => {
-                chai.assert.deepEqual(
-                    result,
-                    values[i]
-                );
-            });
-        });
     });
 
     describe("#getConsumedIOs", () => {
