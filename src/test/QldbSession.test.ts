@@ -32,7 +32,6 @@ import * as Errors from "../errors/Errors";
 import * as LogUtil from "../LogUtil";
 import { QldbSession } from "../QldbSession";
 import { Result } from "../Result";
-import { ResultReadable } from "../ResultReadable";
 import { Transaction } from "../Transaction";
 import { AWSError } from "aws-sdk";
 
@@ -68,7 +67,6 @@ mockTransaction.getTransactionId = () => {
     return "mockTransactionId";
 };
 
-const resultReadableObject: ResultReadable = new ResultReadable(testTransactionId, testExecuteStatementResult, mockCommunicator);
 let qldbSession: QldbSession;
 
 describe("QldbSession", () => {
@@ -135,34 +133,6 @@ describe("QldbSession", () => {
             sinon.assert.calledOnce(executeSpy);
             sinon.assert.calledWith(executeSpy, testStatement);
             sinon.assert.calledOnce(startTransactionSpy);
-            sinon.assert.calledOnce(commitSpy);
-            chai.assert.equal(result, mockResult);
-        });
-
-        it("should return a Result object when called with executeAndStreamResults as the lambda", async () => {
-            const resultStub = sandbox.stub(Result, "bufferResultReadable");
-            resultStub.returns(Promise.resolve(mockResult));
-
-            qldbSession._startTransaction = async () => {
-                return mockTransaction;
-            };
-            mockTransaction.executeAndStreamResults = async () => {
-                return resultReadableObject;
-            };
-            mockTransaction.commit = async () => {};
-
-            const executeAndStreamResultsSpy = sandbox.spy(mockTransaction, "executeAndStreamResults");
-            const startTransactionSpy = sandbox.spy(qldbSession, "_startTransaction");
-            const commitSpy = sandbox.spy(mockTransaction, "commit");
-
-            const result = await qldbSession.executeLambda(async (txn) => {
-                const resultReadable: ResultReadable = await txn.executeAndStreamResults(testStatement);
-                return Result.bufferResultReadable(resultReadable);
-            });
-            sinon.assert.calledOnce(executeAndStreamResultsSpy);
-            sinon.assert.calledWith(executeAndStreamResultsSpy, testStatement);
-            sinon.assert.calledOnce(startTransactionSpy);
-            sinon.assert.calledOnce(resultStub);
             sinon.assert.calledOnce(commitSpy);
             chai.assert.equal(result, mockResult);
         });

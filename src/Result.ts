@@ -22,7 +22,6 @@ import { dom } from "ion-js";
 
 import { Communicator } from "./Communicator";
 import { ClientError } from "./errors/Errors"
-import { ResultReadable } from "./ResultReadable";
 import { IOUsage } from "./stats/IOUsage";
 import { TimingInformation } from "./stats/TimingInformation";
 
@@ -65,16 +64,6 @@ export class Result {
     }
 
     /**
-     * Static method that creates a Result object by reading and buffering the contents of a ResultReadable.
-     * @param resultReadable A ResultReadable object to convert to a Result object.
-     * @returns Promise which fulfills with a Result.
-     */
-    static async bufferResultReadable(resultReadable: ResultReadable): Promise<Result> {
-        const resultList: dom.Value[] = await Result._readResultReadable(resultReadable);
-        return new Result(resultList, resultReadable.getConsumedIOs(), resultReadable.getTimingInformation());
-    }
-
-    /**
      * Returns the list of results of the statement execution returned from QLDB.
      * @returns A list of Ion values which wrap the Ion values returned from the QLDB statement execution.
      */
@@ -107,10 +96,7 @@ export class Result {
      * 
      * @internal
      */
-    static _handleBlob(ionBinary: IonBinary): Buffer|Uint8Array|string {
-        if (ionBinary instanceof Buffer) {
-            return <Buffer> ionBinary;
-        }
+    static _handleBlob(ionBinary: IonBinary): Uint8Array|string {
         if (ionBinary instanceof Uint8Array) {
             return <Uint8Array> ionBinary;
         }
@@ -167,21 +153,5 @@ export class Result {
         const ioUsage: IOUsage = readIO != null ? new IOUsage(readIO) : null;
         const timingInformation = processingTime != null ? new TimingInformation(processingTime) : null;
         return new Result(ionValues, ioUsage, timingInformation);
-    }
-
-    /**
-     * Helper method that reads a ResultReadable and extracts the results, placing them in an array of Ion values.
-     * @param resultReadable The ResultReadable to read.
-     * @returns Promise which fulfills with a list of Ion values, representing all the returned values of the result set.
-     */
-    private static async _readResultReadable(resultReadable: ResultReadable): Promise<dom.Value[]> {
-        return new Promise(res => {
-            let ionValues: dom.Value[] = [];
-            resultReadable.on("data", function(value) {
-                ionValues.push(value);
-            }).on("end", function() {
-                res(ionValues);
-            });
-        });
     }
 }

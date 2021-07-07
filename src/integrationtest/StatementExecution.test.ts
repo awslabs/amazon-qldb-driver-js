@@ -19,10 +19,7 @@ import { dom, IonType } from "ion-js";
 import { isOccConflictException } from "../errors/Errors";
 import { QldbDriver } from "../QldbDriver";
 import { Result } from "../Result";
-import { ResultReadable } from "../ResultReadable";
 import { RetryConfig } from "../retry/RetryConfig";
-import { IOUsage } from "../stats/IOUsage";
-import { TimingInformation } from "../stats/TimingInformation";
 import { TransactionExecutor } from "../TransactionExecutor";
 import * as constants from "./TestConstants";
 import { TestUtils } from "./TestUtils";
@@ -245,19 +242,6 @@ describe("StatementExecution", function() {
         chai.assert.isNotNull(result.getTimingInformation());
         chai.assert.equal(result.getConsumedIOs().getReadIOs(), 1092);
         chai.assert.isTrue(result.getTimingInformation().getProcessingTimeMilliseconds() > 0);
-
-        // executeAndStreamResults
-        await driver.executeLambda(async (txn: TransactionExecutor) => {
-            const resultReadable: ResultReadable = await txn.executeAndStreamResults(searchQuery);
-
-            const ioUsage: IOUsage = resultReadable.getConsumedIOs();
-            const timingInformation: TimingInformation = resultReadable.getTimingInformation();
-
-            chai.assert.isNotNull(ioUsage);
-            chai.assert.isNotNull(timingInformation);
-            chai.assert.isTrue(ioUsage.getReadIOs() > 0);
-            chai.assert.isTrue(timingInformation.getProcessingTimeMilliseconds() > 0);
-        });
     });
 
     it("Can delete all documents", async () => {

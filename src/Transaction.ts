@@ -19,7 +19,6 @@ import { Communicator } from "./Communicator";
 import { ClientError } from "./errors/Errors";
 import { QldbHash } from "./QldbHash";
 import { Result } from "./Result";
-import { ResultReadable } from "./ResultReadable";
 
 /**
  * A class representing a QLDB transaction.
@@ -92,24 +91,6 @@ export class Transaction {
     async execute(statement: string, ...parameters: any[]): Promise<Result> {
         const result: ExecuteStatementResult = await this._sendExecute(statement, parameters);
         return Result.create(this._txnId, result, this._communicator);
-    }
-
-    /**
-     * Execute the specified statement in the current transaction. This method returns a promise
-     * which fulfills with Readable Stream, which allows you to stream one record at time
-     *
-     * @param statement A statement to execute against QLDB as a string.
-     * @param parameters Variable number of arguments, where each argument corresponds to a
-     *                  placeholder (?) in the PartiQL query.
-     *                  The argument could be any native JavaScript type or an Ion DOM type.
-     *                  [Details of Ion DOM type and JavaScript type](https://github.com/amzn/ion-js/blob/master/src/dom/README.md#iondom-data-types)
-     * @returns Promise which fulfills with a Readable Stream
-     * @throws {@linkcode TransactionClosedError} when the transaction is closed.
-     * @throws [Error](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error) when the passed argument value cannot be converted into Ion
-     */
-    async executeAndStreamResults(statement: string, ...parameters: any[]): Promise<ResultReadable> {
-        const result: ExecuteStatementResult = await this._sendExecute(statement, parameters);
-        return new ResultReadable(this._txnId, result, this._communicator);
     }
 
     /**

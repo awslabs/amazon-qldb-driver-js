@@ -20,7 +20,6 @@ import * as sinon from "sinon";
 
 import { LambdaAbortedError } from "../errors/Errors";
 import { Result } from "../Result";
-import { ResultReadable } from "../ResultReadable";
 import { Transaction } from "../Transaction";
 import { TransactionExecutor } from "../TransactionExecutor";
 
@@ -32,7 +31,6 @@ const testMessage: string = "foo";
 const testTransactionId: string = "txnId";
 
 const mockResult: Result = <Result><any> sandbox.mock(Result);
-const mockResultReadable: ResultReadable = <ResultReadable><any> sandbox.mock(ResultReadable);
 const mockTransaction: Transaction = <Transaction><any> sandbox.mock(Transaction);
 
 let transactionExecutor: TransactionExecutor;
@@ -91,42 +89,6 @@ describe("TransactionExecutor", () => {
             };
             const transactionExecuteSpy = sandbox.spy(mockTransaction, "execute");
             const errorMessage = await chai.expect(transactionExecutor.execute(testStatement)).to.be.rejected;
-            chai.assert.equal(errorMessage.name, "Error");
-            sinon.assert.calledOnce(transactionExecuteSpy);
-            sinon.assert.calledWith(transactionExecuteSpy, testStatement);
-        });
-    });
-
-    describe("#executeAndStreamResults()", () => {
-        it("should return a Result object when provided with a statement", async () => {
-            mockTransaction.executeAndStreamResults = async () => {
-                return mockResultReadable;
-            };
-            const transactionExecuteSpy = sandbox.spy(mockTransaction, "executeAndStreamResults");
-            const resultReadable = await transactionExecutor.executeAndStreamResults(testStatement);
-            chai.assert.equal(mockResultReadable, resultReadable);
-            sinon.assert.calledOnce(transactionExecuteSpy);
-            sinon.assert.calledWith(transactionExecuteSpy, testStatement);
-        });
-
-        it("should return a Result object when provided with a statement and parameters", async () => {
-            mockTransaction.executeAndStreamResults = async () => {
-                return mockResultReadable;
-            };
-
-            const transactionExecuteSpy = sandbox.spy(mockTransaction, "executeAndStreamResults");
-            const resultReadable = await transactionExecutor.executeAndStreamResults(testStatement, [5]);
-            chai.assert.equal(mockResultReadable, resultReadable);
-            sinon.assert.calledOnce(transactionExecuteSpy);
-            sinon.assert.calledWith(transactionExecuteSpy, testStatement, [5]);
-        });
-
-        it("should return a rejected promise when error is thrown", async () => {
-            mockTransaction.executeAndStreamResults = async () => {
-                throw new Error(testMessage);
-            };
-            const transactionExecuteSpy = sandbox.spy(mockTransaction, "executeAndStreamResults");
-            const errorMessage = await chai.expect(transactionExecutor.executeAndStreamResults(testStatement)).to.be.rejected;
             chai.assert.equal(errorMessage.name, "Error");
             sinon.assert.calledOnce(transactionExecuteSpy);
             sinon.assert.calledWith(transactionExecuteSpy, testStatement);
