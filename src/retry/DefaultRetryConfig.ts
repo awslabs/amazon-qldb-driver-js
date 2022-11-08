@@ -26,11 +26,9 @@ const SLEEP_BASE_MS: number = 10;
  * 
  * @internal
  */
-export const defaultBackoffFunction: BackoffFunction = (retryAttempt: number, error: Error, transactionId: string) => {
-    const exponentialBackoff: number = Math.min(SLEEP_CAP_MS, Math.pow(SLEEP_BASE_MS * 2,  retryAttempt));
-    const jitterRand: number = Math.random();
-    const delayTime: number = jitterRand * exponentialBackoff;
-    return delayTime;
+export const defaultBackoffFunction: BackoffFunction = (retryAttempt: number, error: Error, transactionId: string):number => {
+    const fullJitterBackoffMax: number = Math.min(SLEEP_CAP_MS, SLEEP_BASE_MS * 2 ** retryAttempt);
+    return Math.random() * fullJitterBackoffMax;
 }
 
 export const defaultRetryConfig: RetryConfig = new RetryConfig(4, defaultBackoffFunction);
