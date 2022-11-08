@@ -1,6 +1,6 @@
 ## Amazon QLDB JavaScript Driver
 
-[![NPM Version](https://img.shields.io/badge/npm-v0.0.1-green)](https://www.npmjs.com/package/amazon-qldb-driver-js)
+[![NPM Version](https://img.shields.io/badge/npm-v0.0.2-green)](https://www.npmjs.com/package/amazon-qldb-driver-js)
 [![license](https://img.shields.io/badge/license-Apache%202.0-blue)](https://github.com/awslabs/amazon-qldb-driver-js/blob/master/LICENSE)
 [![AWS Provider](https://img.shields.io/badge/provider-AWS-orange?logo=amazon-aws&color=ff9900)](https://aws.amazon.com/qldb/)
 
